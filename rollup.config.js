@@ -12,9 +12,19 @@ export default {
   plugins: [
     resolve(),
     commonjs(),
-    typescript(),
+    typescript({
+      tsconfig: "tsconfig.json",
+      useTsconfigDeclarationDir: true,
+    }),
     scss({
-      output: "dist/styles.css", // Generate a CSS file in the output directory
+      output: (styles) => {
+        const sass = require("sass");
+        const { css } = sass.renderSync({
+          data: styles,
+          outputStyle: "compressed", // Minify the CSS
+        });
+        require("fs").writeFileSync("dist/styles.min.css", css);
+      }, // Generate a CSS file in the output directory
       sass: require("sass"), // Use Dart Sass
     }),
   ],

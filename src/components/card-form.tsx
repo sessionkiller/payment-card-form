@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./card-form.scss";
 
-interface CardValues {
+export interface CardValues {
   cardName?: string;
   cardNumber?: string;
   cardCvv?: string;
@@ -11,17 +11,21 @@ interface CardValues {
 }
 
 interface CardFormProps {
-  value?: CardValues;
-  onChange?: (data: CardValues) => void;
-  defaultValue?: CardValues;
+  onSubmit: (data: CardValues) => void;
+  defaultValues?: CardValues;
+  resetAfterSubmit?: boolean;
 }
 
-const CardForm = ({ value, defaultValue, onChange }: CardFormProps) => {
-  const defaultValues = () => {
-    const obj = value || defaultValue || {};
+const CardForm = ({
+  onSubmit,
+  defaultValues,
+  resetAfterSubmit = true,
+}: CardFormProps) => {
+  const initialValues = () => {
+    const obj = defaultValues || {};
     return {
       cardName: obj.cardName || "",
-      cardNumber: obj.cardNumber || "",
+      cardNumber: obj.cardNumber || getMaskForCardType(""),
       cardCvv: obj.cardCvv || "",
       cardYear: obj.cardYear || 0,
       cardMonth: obj.cardMonth || "",
@@ -29,7 +33,7 @@ const CardForm = ({ value, defaultValue, onChange }: CardFormProps) => {
     };
   };
 
-  const [data, setData] = useState<CardValues>(defaultValues);
+  const [data, setData] = useState<CardValues>(initialValues);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [focusElementStyle, setFocusElementStyle] = useState<
@@ -51,23 +55,16 @@ const CardForm = ({ value, defaultValue, onChange }: CardFormProps) => {
   useEffect(() => {
     updateCardBackground();
     updateCardType();
-
-    if (!data.cardNumber) {
-      const placeholder = getMaskForCardType("");
-      updateData("cardNumber", placeholder);
-    }
   }, []);
 
   const updateData = (key: keyof CardValues, value: string | number) => {
-    const newData = {
-      ...data,
-      [key]: key === "cardYear" ? parseInt(`${value}`) : value,
-    };
-
-    setData(newData);
-    if (onChange) {
-      onChange(newData);
-    }
+    setData((prevData) => {
+      const newData = {
+        ...prevData,
+        [key]: key === "cardYear" ? parseInt(`${value}`) : value,
+      };
+      return newData;
+    });
   };
 
   const updateCardType = () => {
@@ -129,7 +126,7 @@ const CardForm = ({ value, defaultValue, onChange }: CardFormProps) => {
     updateCardType();
   };
 
-  const getMaskForCardType = (type: string) => {
+  function getMaskForCardType(type: string) {
     switch (type) {
       case "amex":
         return "#### ###### #####";
@@ -138,7 +135,7 @@ const CardForm = ({ value, defaultValue, onChange }: CardFormProps) => {
       default:
         return "#### #### #### ####";
     }
-  };
+  }
 
   const focusInput = () => {
     if (data.cardNumber === "#### #### #### ####") {
@@ -185,6 +182,13 @@ const CardForm = ({ value, defaultValue, onChange }: CardFormProps) => {
     return data.cardType
       ? `${baseUrl}${data.cardType}.png`
       : `${baseUrl}visa.png`;
+  };
+
+  const submitData = () => {
+    onSubmit(data);
+    if (resetAfterSubmit) {
+      setData(initialValues);
+    }
   };
 
   return (
@@ -384,6 +388,9 @@ const CardForm = ({ value, defaultValue, onChange }: CardFormProps) => {
             </div>
           </div>
         </div>
+        <button className="card-form__button" onClick={submitData}>
+          Submit
+        </button>
       </div>
     </div>
   );

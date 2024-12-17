@@ -5,13 +5,13 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
-  "style": "dist/styles.css",
+  "style": "dist/styles.min.css",
   "files": [
     "dist",
     "README.md"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c --bundleConfigAsCjs",
     "test": "jest"
   },
   "keywords": [
@@ -34,13 +34,13 @@
     "react-dom": ">=16.8.0"
   },
   "devDependencies": {
-    "@types/react": "^18.0.27",
-    "@types/react-dom": "^18.0.10",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
     "rollup": "^4.28.1",
-    "rollup-plugin-typescript2": "^0.36.0",
     "rollup-plugin-scss": "^4.0.0",
+    "rollup-plugin-typescript2": "^0.36.0",
     "sass": "^1.83.0",
     "typescript": "^4.9.5"
   },
